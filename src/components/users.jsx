@@ -32,6 +32,10 @@ class Users extends React.Component {
 		});
 	}
 
+	navigateDetails = (userid) => {
+		this.props.history.push("/userDetails/"+userid);
+	}
+
 	render() {
 		let { users } = this.state;
 		return (
