@@ -6,6 +6,8 @@ import { alertError, alertInfo, alertSuccess } from '../config/toaster';
 import { nameRE, mobileRE, usernameRE } from '../config/RegEx';
 import { logout } from '../actions/session';
 import { removeToken } from '../config/localStorage';
+import { Row, Col, Card, Image, Form, Button } from 'react-bootstrap';
+const defImg = require('../assets/noImage.png');
 
 class UserDetails extends React.Component {
 	constructor(props) {
@@ -15,13 +17,16 @@ class UserDetails extends React.Component {
 			this.props.history.goBack();
 		}
 
+		this.imgInputRef = React.createRef();
+
 		this.state = {
 			profpic: '',
 			name: '',
 			username: '',
 			email: '',
 			mobile: '',
-			isUser: false
+			isUser: false,
+			prof: null
 		};
 	}
 
@@ -50,7 +55,7 @@ class UserDetails extends React.Component {
 	}
 
 	handleFile = ({ target: { files } }) => {
-		this.setState({profpic: files[0]});
+		this.setState({profpic: URL.createObjectURL(files[0]), prof: files[0]});
 	}
 
 	validate = () => {
@@ -58,12 +63,21 @@ class UserDetails extends React.Component {
 		return nameRE.test(name) && mobileRE.test(mobile) && usernameRE.test(username) && this.props.userid === this.props.match.params.userid;
 	}
 
-	handleSubmit = () => {
+	handleSubmit = (e) => {
+		e.preventDefault();
 		if(this.validate()) {
 			this.props.startLoading();
-			let { name, username, mobile } = this.state;
+			let { name, username, mobile, prof } = this.state;
 			let { userid } = this.props;
-			updateProfileReq({name, username, mobile, userid})
+			let formData = new FormData();
+			formData.append('name', name);
+			formData.append('username', username);
+			formData.append('mobile', mobile);
+			formData.append('userid', userid);
+			if(prof) {
+				formData.append('prof', prof);
+			}
+			updateProfileReq(formData)
 			.then( (res) => {
 				alertSuccess(res.data.message || "Profile Updated Successfully");
 			}).catch( (err) => {
@@ -123,9 +137,61 @@ class UserDetails extends React.Component {
 	}
 
 	render() {
-		let { profpic, name, username, email, mobile, isUser } = this.state;
+		let { handleSubmit, handleChange, validate, handleFile, imgInputRef, state: { profpic, name, username, email, mobile, isUser, prof } } = this;
 		return (
-			<></>
+			<Row style={{marginLeft: 0, marginRight: 0}}>
+				<Col md={{span: 7, offset: 2}} lg={{span: 8, offset: 2}} xs={12}>
+					<Card style={{marginTop: '10%'}}>
+						<Card.Body>
+							{isUser ?
+								<Form onSubmit={handleSubmit}>
+									<Row style={{marginLeft: 0, marginRight: 0}}>
+										<Col>
+											<Form.Group>
+												<Form.Control type="file" style={{display: 'none'}} ref={imgInputRef} onChange={handleFile} />
+												<Image fluid rounded onClick={() => {imgInputRef.current.click()}} src={prof || defImg} style={{cursor: 'pointer'}} />
+											</Form.Group>
+										</Col>
+
+										<Col style={{marginLeft: '10%', paddingTop: '10%'}}>
+											<Form.Group>
+												<Form.Control value={name} onChange={handleChange} name="name" type="text" placeholder="Name" />
+											</Form.Group>
+											<Form.Group>
+												<Form.Control value={username} onChange={handleChange} name="username"type="text" placeholder="Username" />
+											</Form.Group>
+											<Form.Group>
+												<Form.Control value={email} onChange={handleChange} name="email" type="text" placeholder="Email" />
+											</Form.Group>
+											<Form.Group>
+												<Form.Control value={mobile} onChange={handleChange} name="mobile" type="text" placeholder="Mobile Number" />
+											</Form.Group>
+											<Form.Group>
+												<Button variant="primary" type="submit" style={{width: '100%'}} disabled={!validate()}>
+													Submit Changes
+												</Button>
+											</Form.Group>
+										</Col>
+									</Row>
+								</Form>
+							:
+								<Row style={{marginLeft: 0, marginRight: 0}}>
+									<Col>
+										<Image fluid rounded src={profpic || defImg} />
+									</Col>
+
+									<Col style={{marginLeft: '10%'}}>
+										<p style={{fontWeight: 'bolder', fontSize: 55}}>{name}</p>
+										<p style={{color: 'gray', fontSize: 22, marginTop: '10%'}}>{username}</p>
+										<p style={{color: 'gray', fontSize: 22}}>{email}</p>
+										<p style={{color: 'gray', fontSize: 22}}>{mobile || ''}</p>
+									</Col>
+								</Row>
+							}
+						</Card.Body>
+					</Card>
+				</Col>
+			</Row>
 		);
 	}
 }

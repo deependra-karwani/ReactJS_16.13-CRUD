@@ -4,6 +4,7 @@ import { startLoading, stopLoading } from '../actions/common';
 import { emailRE, passwordRE } from '../config/RegEx';
 import { forgotPasswordReq } from '../config/httpRoutes';
 import { alertError, alertSuccess } from '../config/toaster';
+import { Row, Form, Col, Card, Button } from 'react-bootstrap';
 
 class ForgotPassword extends React.Component {
 	constructor(props) {
@@ -20,7 +21,8 @@ class ForgotPassword extends React.Component {
 		this.setState({[name]: value});
 	}
 
-	handleSubmit = () => {
+	handleSubmit = (e) => {
+		e.preventDefault();
 		if(this.validate()) {
 			this.props.startLoading();
 			let { email, password } = this.state;
@@ -46,9 +48,38 @@ class ForgotPassword extends React.Component {
 	}
 
 	render() {
-		let { email, password, confPass } = this.state;
+		let { handleSubmit, handleChange, validate, state: { email, password, confPass } } = this;
 		return (
-			<></>
+			<Row style={{marginLeft: 0, marginRight: 0}}>
+				<Col md={{span: 4, offset: 4}} lg={{span: 4, offset: 4}} xs={12}>
+					<Card style={{marginTop: '25%'}}>
+						<Card.Header>
+							<Card.Title style={{textAlign: 'center', fontWeight: "bold"}}>Change Password</Card.Title>
+						</Card.Header>
+						<Card.Body>
+							<Form onSubmit={handleSubmit}>
+								<Form.Group>
+									<Form.Control name="email" value={email} onChange={handleChange} type="email" placeholder="E-mail Address" />
+								</Form.Group>
+
+								<Form.Group>
+									<Form.Control name="password" value={password} onChange={handleChange} type="password" placeholder="Password" />
+								</Form.Group>
+
+								<Form.Group>
+									<Form.Control name="confPass" value={confPass} onChange={handleChange} type="password" placeholder="Confirm Password" />
+								</Form.Group>
+
+								<Form.Group>
+									<Button variant="primary" type="submit" style={{width: '100%'}} disabled={!validate()}>
+										Change Password
+									</Button>
+								</Form.Group>
+							</Form>
+						</Card.Body>
+					</Card>
+				</Col>
+			</Row>
 		);
 	}
 }

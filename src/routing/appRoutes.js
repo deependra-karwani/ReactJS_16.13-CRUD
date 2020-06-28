@@ -10,11 +10,19 @@ import { Router, /* Route, */ Redirect, Switch } from 'react-router-dom';
 import history from '../config/history';
 import UnauthRoute from './unauthRoute';
 import AuthRoute from './authRoute';
+import { Container, Spinner, Modal } from 'react-bootstrap';
+
+import { connect } from 'react-redux';
 
 class AppRouter extends Component {
 	render() {
 		return (
-			<div className="container-fluid">
+			<Container fluid={true}>
+				<Modal show={this.props.loading} centered size="sm">
+					<Modal.Dialog style={{backgroundColor: 'transparent', border: 'none'}}>
+						<Spinner animation="border" />
+					</Modal.Dialog>
+				</Modal>
 				<Router history={history}>
 					<Switch>
 						<Redirect exact from="/" to="/login" />
@@ -29,9 +37,13 @@ class AppRouter extends Component {
 						<Redirect from="*" to="/login" />
 					</Switch>
 				</Router>
-			</div>
+			</Container>
 		);
 	}
 }
 
-export default AppRouter;
+const mapStateToProps = (state) => ({
+	loading: state.common.loading
+});
+
+export default connect(mapStateToProps)(AppRouter);
