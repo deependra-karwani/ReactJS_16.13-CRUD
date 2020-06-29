@@ -10,7 +10,8 @@ import { Router, /* Route, */ Redirect, Switch } from 'react-router-dom';
 import history from '../config/history';
 import UnauthRoute from './unauthRoute';
 import AuthRoute from './authRoute';
-import { Container, Spinner, Modal } from 'react-bootstrap';
+import { Container, Spinner, Modal, Nav, Navbar } from 'react-bootstrap';
+import { isLoggedIn } from '../config/localStorage';
 
 import { connect } from 'react-redux';
 
@@ -23,6 +24,24 @@ class AppRouter extends Component {
 						<Spinner animation="border" />
 					</Modal.Dialog>
 				</Modal>
+				<Navbar bg="dark" variant="dark" expand="lg">
+					{isLoggedIn() ?
+						<Navbar.Collapse>
+							<Nav className="mr-auto">
+								<Nav.Link href="/users">Users</Nav.Link>
+								<Nav.Link href={"/details/"+this.props.userid}>Profile</Nav.Link>
+							</Nav>
+						</Navbar.Collapse>
+					:
+						<Navbar.Collapse>
+							<Nav className="mr-auto">
+								<Nav.Link href="/login">Login</Nav.Link>
+								<Nav.Link href="/register">Register</Nav.Link>
+								<Nav.Link href="/forgot">Forgot Password</Nav.Link>
+							</Nav>
+						</Navbar.Collapse>
+					}
+				</Navbar>
 				<Router history={history}>
 					<Switch>
 						<Redirect exact from="/" to="/login" />
@@ -43,7 +62,8 @@ class AppRouter extends Component {
 }
 
 const mapStateToProps = (state) => ({
-	loading: state.common.loading
+	loading: state.common.loading,
+	userid: state.session.userid
 });
 
 export default connect(mapStateToProps)(AppRouter);

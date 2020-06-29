@@ -115,7 +115,7 @@ class UserDetails extends React.Component {
 	}
 
 	logout = () => {
-		if(this.props.userid === this.props.match.params.userid) {
+		if(this.props.userid === this.props.match.params.userid && window.confirm("Are you sure you want to logout?")) {
 			this.props.startLoading();
 			let { userid } = this.props;
 			logoutReq({userid})
@@ -137,7 +137,7 @@ class UserDetails extends React.Component {
 	}
 
 	render() {
-		let { handleSubmit, handleChange, validate, handleFile, imgInputRef, state: { profpic, name, username, email, mobile, isUser, prof } } = this;
+		let { handleSubmit, handleChange, validate, handleFile, delProf, logout, imgInputRef, state: { profpic, name, username, email, mobile, isUser, prof } } = this;
 		return (
 			<Row style={{marginLeft: 0, marginRight: 0}}>
 				<Col md={{span: 7, offset: 2}} lg={{span: 8, offset: 2}} xs={12}>
@@ -161,14 +161,22 @@ class UserDetails extends React.Component {
 												<Form.Control value={username} onChange={handleChange} name="username"type="text" placeholder="Username" />
 											</Form.Group>
 											<Form.Group>
-												<Form.Control value={email} onChange={handleChange} name="email" type="text" placeholder="Email" />
+												<Form.Control value={email} onChange={handleChange} name="email" type="email" placeholder="Email" />
 											</Form.Group>
 											<Form.Group>
 												<Form.Control value={mobile} onChange={handleChange} name="mobile" type="text" placeholder="Mobile Number" />
 											</Form.Group>
 											<Form.Group>
 												<Button variant="primary" type="submit" style={{width: '100%'}} disabled={!validate()}>
-													Submit Changes
+													Save Changes
+												</Button>
+											</Form.Group>
+											<Form.Group>
+												<Button variant="info" type="submit" style={{width: '45%', color: 'white'}} onClick={logout}>
+													Logout
+												</Button>
+												<Button variant="outline-danger" type="submit" style={{width: '45%', marginLeft: '10%'}} onClick={delProf}>
+													Delete Profile
 												</Button>
 											</Form.Group>
 										</Col>
